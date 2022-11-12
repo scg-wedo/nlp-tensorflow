@@ -46,7 +46,7 @@ SILENCE_LABEL = '_silence_'
 SILENCE_INDEX = 0
 UNKNOWN_WORD_LABEL = '_unknown_'
 UNKNOWN_WORD_INDEX = 1
-BACKGROUND_NOISE_DIR_NAME = '_background_noise_'
+BACKGROUND_NOISE_DIR_NAME = 'background_for_augments'
 RANDOM_SEED = 59185
 
 
@@ -276,7 +276,7 @@ class AudioProcessor(object):
     # Look through all the subfolders to find audio samples
     search_path = os.path.join(self.data_dir, '*', '*.wav')
     for wav_path in gfile.Glob(search_path):
-      _, word = os.path.split(os.path.dirname(wav_path))
+      _, word = os.path.split(os.path.dirname(os.path.dirname(wav_path)))
       word = word.lower()
       # Treat the '_background_noise_' folder as a special case, since we expect
       # it to contain long audio samples we mix in to improve training.
@@ -310,8 +310,9 @@ class AudioProcessor(object):
         })
       # Pick some unknowns to add to each partition of the data set.
       random.shuffle(unknown_index[set_index])
-      unknown_size = int(math.ceil(set_size * unknown_percentage / 100))
-      self.data_index[set_index].extend(unknown_index[set_index][:unknown_size])
+      #unknown_size = int(math.ceil(set_size * unknown_percentage / 100))
+      #self.data_index[set_index].extend(unknown_index[set_index][:unknown_size])
+      self.data_index[set_index].extend(unknown_index[set_index][:])
     # Make sure the ordering is random.
     for set_index in ['validation', 'testing', 'training']:
       random.shuffle(self.data_index[set_index])
